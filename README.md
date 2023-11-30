@@ -45,3 +45,7 @@ Adds or removes line breaks to the end of the selected story. This can be useful
 ## widthExpand /  widthShrink.js
 
 This increases or decreases the width of an object based on the same amount as 10 × the keyboard increment (so the same amount as holding **cmd + →**
+
+## saveAll.js
+
+This simply saves all open documents (after confirmation).
