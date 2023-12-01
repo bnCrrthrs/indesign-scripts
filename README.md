@@ -10,7 +10,7 @@ These four scripts calculate the size between lines in the baseline grid of the 
 
 Probably a bit janky as it was made for a very specific purpose, but (ideally) it scales all images to fill their frames proportionally, rotating them depending on whether the frames are portrait or landscape.
 
-## goToPage
+## goToPage / goToNextPage / goToPreviousPage
 
 This will change the active page for **all** open documents, and set the view to see the whole page and pasteboard. It's useful when you're working on different drafts of the same template.
 
@@ -18,7 +18,7 @@ This will change the active page for **all** open documents, and set the view to
 
 This will allow you to choose a file and what to import from it: Paragraph/Character/Object/Table styles etc
 
-jongware_textInFrame
+## jongware_textInFrame
 
 Originally taken from a forum post by Jongware, but built upon. It places the cursor inside a selected text frame. If no text frame is selected, then any object on the page is selected.
 
@@ -42,9 +42,9 @@ Takes the selected items in the order they were selected, and moves them in that
 
 Adds or removes line breaks to the end of the selected story. This can be useful for breaking/linking text threads.
 
-## widthExpand /  widthShrink.js
+## widthExpand / widthShrink.js
 
-This increases or decreases the width of an object based on the same amount as 10 × the keyboard increment (so the same amount as holding **cmd + →**
+This increases or decreases the width of an object based on the same amount as 10 × the keyboard increment (so the same amount as holding **cmd + →**)
 
 ## saveAll.js
 
