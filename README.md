@@ -30,6 +30,10 @@ Consolidates swatches that have the same colour space and value.
 
 Selects the object above or below **each** item in the selection. This is useful when working on layouts with multiple layers.
 
+## selectTextFrameContents.js
+
+Selects the text contents of the currently selected text frame.
+
 ## stackOrderByArticle.js
 
 Will look at each item in each article in the articles panel, and move them one by one to a chosen layer. This allows you to set the stacking/reading order to match the tag order very easily. If an item is a threaded text frame, each frame in the thread is moved sequentially too, so the story stays in the correct order.
