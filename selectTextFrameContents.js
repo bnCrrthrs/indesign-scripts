@@ -6,12 +6,23 @@
 
   if (selection.parent.constructor.name === "Story") {
     textFrame = selection.parentTextFrames[0];
-  } else if (selection.constructor.name !== "TextFrame") {
-    return;
-  } else {
+  } else if (
+    selection.parent.constructor.name === "Endnote" ||
+    selection.parent.constructor.name === "Footnote" ||
+    selection.parent.constructor.name === "Cell"
+  ) {
+    textFrame = selection.parent;
+  } else if (
+    selection.constructor.name === "TextFrame" ||
+    selection.constructor.name === "EndnoteTextFrame" ||
+    selection.constructor.name === "Cell"
+  ) {
     textFrame = selection;
+  } else {
+    return;
   }
-
-  var l = textFrame.characters.length;
-  textFrame.insertionPoints.itemByRange(0, l).select();
+  try {
+    var l = textFrame.characters.length;
+    textFrame.insertionPoints.itemByRange(0, l).select();
+  } catch (_) {}
 })();
