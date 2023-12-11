@@ -23,6 +23,11 @@
   }
   try {
     var l = textFrame.characters.length;
-    textFrame.insertionPoints.itemByRange(0, l).select();
+    var lastChar = textFrame.insertionPoints.itemByRange(l - 1, l).contents.toString();
+    var space = 0;
+    if (lastChar.match(/\s/g)) {
+      space = 1;
+    }
+    textFrame.insertionPoints.itemByRange(0, l - space).select();
   } catch (_) {}
 })();

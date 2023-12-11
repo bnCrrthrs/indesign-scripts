@@ -32,7 +32,7 @@ Selects the object above or below **each** item in the selection. This is useful
 
 ## selectTextFrameContents.js
 
-Selects the text contents of the currently selected text frame.
+Selects the text contents of the currently selected text frame. Will ignore last character if it is a space to preserve paragraph/character styles when pasting over contents.
 
 ## stackOrderByArticle.js
 
