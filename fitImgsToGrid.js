@@ -3,6 +3,16 @@
   var folder;
   var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg"];
 
+  var marginTop = doc.marginPreferences.top;
+  var marginRight = doc.marginPreferences.right;
+  var marginBottom = doc.marginPreferences.bottom;
+  var marginLeft = doc.marginPreferences.left;
+  var gutter = doc.marginPreferences.columnGutter;
+  var pageWidth = doc.documentPreferences.pageWidth;
+  var pageHeight = doc.documentPreferences.pageHeight;
+  var availableWidth = pageWidth - (marginLeft + marginRight);
+  var availableHeight = pageHeight - (marginBottom + marginTop);
+
   var rows = 4;
   var cols = 2;
 
@@ -20,7 +30,7 @@
   folderName.preferredSize = [250, -1];
 
   // choose rows / columns
-  var panel = window.add("panel", undefined, "Rows and columns");
+  //  var panel = window.add("panel", undefined, "Rows and columns");
 
   // ok go
   group = window.add("group");
@@ -66,7 +76,21 @@
 
   if (contents.length === 0) return alert("No images found in this folder");
 
+  var framesPerPage = rows * cols;
+  var frameWidth = (availableWidth - gutter * (cols - 1)) / cols;
+  var frameHeight = (availableHeight - gutter * (rows - 1)) / rows;
+
   for (var i = 0, l = contents.length; i < l; i++) {
-    //
+    var pageNo = 1 + Math.floor(i / framesPerPage);
+    var col = i % cols;
+    var row = Math.floor(i / cols) % rows;
+    var x = marginLeft + col * frameWidth + col * gutter;
+    var y = marginTop + row * frameHeight + row * gutter;
+    if (pageNo > doc.pages.length) doc.pages.add();
+    var page = doc.pages[pageNo - 1];
+    var frame = page.rectangles.add();
+    frame.geometricBounds = [y, x, y + frameHeight, x + frameWidth];
+    frame.contentType = ContentType.GRAPHIC_TYPE;
+    frame.place(contents[i]);
   }
 })();
