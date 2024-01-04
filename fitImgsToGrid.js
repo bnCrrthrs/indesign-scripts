@@ -1,57 +1,72 @@
-var doc = app.activeDocument;
-var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg"];
-var files = [];
+(function () {
+  var doc = app.activeDocument;
+  var folder;
+  var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg"];
 
-var window = new Window("dialog", "Fit images to grid");
-window.alignChildren = "fill";
+  var rows = 4;
+  var cols = 2;
 
-// dialog
-var group = window.add("group");
+  //+ Select Files dialog
+  var window = new Window("dialog", "Fit images to grid");
+  window.alignChildren = "fill";
 
-// choose folder / files
-var folderBtn = group.add("button", undefined, "Folder...");
-var fileName = group.add("statictext", undefined, "", { truncate: "middle" });
-fileName.text = "Choose files...";
-fileName.preferredSize = [250, -1];
+  // dialog
+  var group = window.add("group");
 
-// choose rows / columns
-var panel = window.add("panel", undefined, "Rows and columns");
+  // choose folder / files
+  var folderBtn = group.add("button", undefined, "Folder...");
+  var folderName = group.add("statictext", undefined, "", { truncate: "middle" });
+  folderName.text = "Choose folder...";
+  folderName.preferredSize = [250, -1];
 
-// ok go
-group = window.add("group");
-group.alignment = "right";
-var btnOK = group.add("button", undefined, "OK");
-var btnCancel = group.add("button", undefined, "Cancel");
-btnOK.enabled = false;
+  // choose rows / columns
+  var panel = window.add("panel", undefined, "Rows and columns");
 
-///////////////////////////////////////////////////////////////////////////////
-// functions
-folderBtn.onClick = function () {
-  var user = new Folder("~/");
-  var f = user.selectDlg("Select a folder"); //, isImg, true); // for windows, the second argument should be something like "*.jpg"
-  if (!f) return;
-  file = f;
-  fileName.text = f.name.replace(/%20/g, " ");
-  btnOK.enabled = true;
-};
+  // ok go
+  group = window.add("group");
+  group.alignment = "right";
+  var btnOK = group.add("button", undefined, "OK");
+  var btnCancel = group.add("button", undefined, "Cancel");
+  btnOK.enabled = false;
 
-btnOK.onClick = function () {
-  window.close(1);
-};
+  //+ Select Files functions
+  folderBtn.onClick = function () {
+    //    var user = new Folder("~/");
+    //    var f = user.selectDlg("Select folder"); //Dialog("Select files", isImg, true); // for windows, the second argument should be something like "*.jpg"
+    var f = Folder.selectDialog("Select folder"); //Dialog("Select files", isImg, true); // for windows, the second argument should be something like "*.jpg"
+    if (!f) return;
+    folder = f;
+    folderName.text = f.fullName; //.replace(/%20/g, " ");
+    btnOK.enabled = true;
+  };
 
-btnCancel.onClick = function () {
-  window.close(0);
-};
+  btnOK.onClick = function () {
+    window.close(1);
+  };
 
-function isImg(file) {
-  var fullName = file.fullName;
-  var lowerCaseName = fullName.toLowerCase();
+  btnCancel.onClick = function () {
+    window.close(0);
+  };
 
-  for (var i = 0; i < imgFormats.length; i++) {
-    var regex = new RegExp("." + imgFormats[i] + "$");
-    if (lowerCaseName.match(regex)) return true;
+  function isImg(file) {
+    var fullName = file.fullName;
+    var lowerCaseName = fullName.toLowerCase();
+
+    for (var i = 0; i < imgFormats.length; i++) {
+      var regex = new RegExp("." + imgFormats[i] + "$");
+      if (lowerCaseName.match(regex)) return true;
+    }
+    return false;
   }
-  return false;
-}
 
-window.show();
+  //+ Do the script
+  if (window.show() === 0) return;
+
+  var contents = folder.getFiles(isImg);
+
+  if (contents.length === 0) return alert("No images found in this folder");
+
+  for (var i = 0, l = contents.length; i < l; i++) {
+    //
+  }
+})();
