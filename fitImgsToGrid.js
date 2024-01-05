@@ -1,7 +1,7 @@
 (function () {
   var doc = app.activeDocument;
   var folder;
-  var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg"];
+  var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg", "tiff", "gif", "jpeg", "bmp", "heic"];
 
   var marginTop = doc.marginPreferences.top;
   var marginRight = doc.marginPreferences.right;
