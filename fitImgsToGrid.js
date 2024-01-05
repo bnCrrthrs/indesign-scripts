@@ -12,6 +12,9 @@
   var pageHeight = doc.documentPreferences.pageHeight;
   var availableWidth = pageWidth - (marginLeft + marginRight);
   var availableHeight = pageHeight - (marginBottom + marginTop);
+  var rows = 4;
+  var cols = 2;
+  var maxRows, maxCols;
 
   if (availableWidth <= 0) {
     availableWidth = pageWidth;
@@ -21,10 +24,6 @@
     availableHeight = pageHeight;
     marginTop = 0;
   }
-
-  var rows = 4;
-  var cols = 2;
-  var maxRows, maxCols;
 
   if (gutter === 0) {
     maxRows = Math.floor(availableHeight);
@@ -41,13 +40,13 @@
   // dialog
   var group = window.add("group");
 
-  // choose folder / files
+  // choose folder
   var folderBtn = group.add("button", undefined, "Folder...");
   var folderName = group.add("statictext", undefined, "", { truncate: "middle" });
   folderName.text = "Choose folder...";
   folderName.preferredSize = [250, -1];
 
-  // choose rows / columns
+  // input rows & columns
   var panel = window.add("panel", undefined, "Grid layout");
   group = panel.add("group");
 
@@ -61,14 +60,14 @@
   colInput.characters = rowInput.characters = 4;
   rowInput.helpTip = "Maximum: " + maxRows;
 
-  // ok go
+  // ok & cancel buttons
   group = window.add("group");
   group.alignment = "right";
   var btnOK = group.add("button", undefined, "OK");
   var btnCancel = group.add("button", undefined, "Cancel");
   btnOK.enabled = false;
 
-  //+ Select Folder functions
+  //+ Dialog functions
   folderBtn.onClick = function () {
     //    var user = new Folder("~/");
     //    var f = user.selectDlg("Select folder"); //Dialog("Select files", isImg, true); // for windows, the second argument should be something like "*.jpg"
