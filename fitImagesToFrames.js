@@ -7,13 +7,15 @@
   var frames = doc.pageItems;
   var transformationMatrix = app.transformationMatrices.add();
   transformationMatrix = transformationMatrix.rotateMatrix(90);
-  if (frames.length > 0 && !confirm('Do you want to fit all graphics to their frames?')) return;
+  if (frames.length > 0 && !confirm("Do you want to fit all graphics to their frames?")) return;
+  app.activeWindow.transformReferencePoint = AnchorPoint.CENTER_ANCHOR;
 
   for (var i = 0, length = frames.length; i < length; i++) {
     var frame = frames[i];
     if (frame.contentType !== ContentType.GRAPHIC_TYPE) continue;
 
     var img = frame.allGraphics[0];
+    img.fit(FitOptions.CENTER_CONTENT);
     img.absoluteRotationAngle = 0;
     img.horizontalScale = img.verticalScale;
 
