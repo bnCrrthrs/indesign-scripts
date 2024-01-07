@@ -131,16 +131,56 @@
     return file instanceof Folder;
   }
 
-  function pushImgsToArray(folder) {
+  function pushImgsToArray(folder, progSteps) {
     var folderContents = folder.getFiles();
-    for (var i = 0; i < folderContents.length; i++) {
+    var length = folderContents.length;
+    var step = progSteps / length;
+    for (var i = 0; i < length; i++) {
       var file = folderContents[i];
-      if (isImg(file)) {
+      if (recur && isFolder(file)) {
+        pushImgsToArray(file, step);
+        continue;
+      } else if (isImg(file)) {
         contents.push(file);
-      } else if (recur && isFolder(file)) {
-        pushImgsToArray(file);
       }
+      progress.increment(step);
+
+      // if (isImg(file)) {
+      //   contents.push(file);
+      // } else if (recur && isFolder(file)) {
+      //   pushImgsToArray(file);
+      // }
     }
+  }
+
+  function progress(msg) {
+    var progWindow = new Window("palette", "Progress", undefined, { closeButton: false });
+    var text = progWindow.add("statictext", undefined, msg);
+    var bar = progWindow.add("progressbar");
+    text.preferredSize = [450, -1];
+    bar.preferredSize = [450, -1];
+
+    progress.close = function () {
+      progWindow.close();
+    };
+
+    progress.increment = function (inc) {
+      bar.value += inc;
+    };
+
+    progress.msg = function (msg) {
+      text.text = msg;
+      progWindow.update();
+    };
+
+    progress.set = function (steps) {
+      bar.value = 0;
+      bar.minvalue = 0;
+      bar.maxvalue = steps;
+    };
+
+    progWindow.show();
+    progWindow.update();
   }
 
   //+ Do the script
@@ -150,14 +190,24 @@
   cols = Number(colInput.text) || cols;
   recur = btnRecur.value;
 
-  pushImgsToArray(folder);
-  if (contents.length === 0) return alert("No images found in this folder");
+  progress("Collecting images...");
+  progress.set(100);
+  pushImgsToArray(folder, 100);
+
+  if (contents.length === 0) {
+    alert("No images found in this folder");
+    progress.close();
+    return;
+  }
+  var imagesFound = contents.length;
+  progress.msg("Placing images...");
+  progress.set(imagesFound);
 
   var framesPerPage = rows * cols;
   var frameWidth = (availableWidth - gutter * (cols - 1)) / cols;
   var frameHeight = (availableHeight - gutter * (rows - 1)) / rows;
 
-  for (var i = 0, l = contents.length; i < l; i++) {
+  for (var i = 0; i < imagesFound; i++) {
     var pageNo = 1 + Math.floor(i / framesPerPage);
     var col = i % cols;
     var row = Math.floor(i / cols) % rows;
@@ -169,5 +219,7 @@
     frame.geometricBounds = [y, x, y + frameHeight, x + frameWidth];
     frame.contentType = ContentType.GRAPHIC_TYPE;
     frame.place(contents[i]);
+    progress.increment(1);
   }
+  progress.close();
 })();
