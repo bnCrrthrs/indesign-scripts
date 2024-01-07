@@ -1,7 +1,9 @@
 (function () {
   var doc = app.activeDocument;
   var folder;
-  var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg", "tiff", "gif", "jpeg", "bmp", "heic"];
+  var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg", "tiff", "gif", "jpeg", "bmp", "heic", "pdf"];
+  var contents = [];
+  var recur;
 
   var marginTop = doc.marginPreferences.top;
   var marginRight = doc.marginPreferences.right;
@@ -59,6 +61,10 @@
   colInput.helpTip = "Maximum: " + maxCols;
   colInput.characters = rowInput.characters = 4;
   rowInput.helpTip = "Maximum: " + maxRows;
+
+  // recursive
+  group = window.add("group");
+  var btnRecur = group.add("checkbox", undefined, "Include subfolders");
 
   // ok & cancel buttons
   group = window.add("group");
@@ -121,13 +127,30 @@
     return false;
   }
 
+  function isFolder(file) {
+    return file instanceof Folder;
+  }
+
+  function pushImgsToArray(folder) {
+    var folderContents = folder.getFiles();
+    for (var i = 0; i < folderContents.length; i++) {
+      var file = folderContents[i];
+      if (isImg(file)) {
+        contents.push(file);
+      } else if (recur && isFolder(file)) {
+        pushImgsToArray(file);
+      }
+    }
+  }
+
   //+ Do the script
   if (window.show() === 0) return;
 
-  var contents = folder.getFiles(isImg);
   rows = Number(rowInput.text) || rows;
   cols = Number(colInput.text) || cols;
+  recur = btnRecur.value;
 
+  pushImgsToArray(folder);
   if (contents.length === 0) return alert("No images found in this folder");
 
   var framesPerPage = rows * cols;
