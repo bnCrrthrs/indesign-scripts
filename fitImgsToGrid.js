@@ -17,6 +17,7 @@
   var rows = 4;
   var cols = 2;
   var maxRows, maxCols;
+  var facingPages = doc.documentPreferences.facingPages;
 
   if (availableWidth <= 0) {
     availableWidth = pageWidth;
@@ -144,12 +145,17 @@
         contents.push(file);
       }
       progress.increment(step);
+    }
+  }
 
-      // if (isImg(file)) {
-      //   contents.push(file);
-      // } else if (recur && isFolder(file)) {
-      //   pushImgsToArray(file);
-      // }
+  function getX(col, pageNo) {
+    var indent = col * frameWidth + col * gutter;
+    if (!facingPages || pageNo === 1) {
+      return indent + marginLeft;
+    } else if (pageNo % 2) {
+      return indent + marginLeft + pageWidth;
+    } else {
+      return indent + marginRight;
     }
   }
 
@@ -211,7 +217,7 @@
     var pageNo = 1 + Math.floor(i / framesPerPage);
     var col = i % cols;
     var row = Math.floor(i / cols) % rows;
-    var x = marginLeft + col * frameWidth + col * gutter;
+    var x = getX(col, pageNo);
     var y = marginTop + row * frameHeight + row * gutter;
     if (pageNo > doc.pages.length) doc.pages.add();
     var page = doc.pages[pageNo - 1];
