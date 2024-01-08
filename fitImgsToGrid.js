@@ -3,6 +3,7 @@
   var folder;
   var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg", "tiff", "gif", "jpeg", "bmp", "heic", "pdf"];
   var contents = [];
+  var failedFiles = [];
   var recur;
 
   var marginTop = doc.marginPreferences.top;
@@ -224,8 +225,16 @@
     var frame = page.rectangles.add();
     frame.geometricBounds = [y, x, y + frameHeight, x + frameWidth];
     frame.contentType = ContentType.GRAPHIC_TYPE;
-    frame.place(contents[i]);
+    try {
+      frame.place(contents[i]);
+    } catch (e) {
+      failedFiles.push(contents[i].name);
+    }
     progress.increment(1);
   }
   progress.close();
+
+  if (failedFiles.length > 0) {
+    alert("Problems with the following files:\n" + failedFiles.join("\n"));
+  }
 })();
