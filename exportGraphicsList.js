@@ -48,7 +48,7 @@
     var name = link.name;
     var parent = link.linkResourceURI.match(/[^\/]*(?=\/[^\/]*$)/)[0];
     var displayParent = parent.replace(/%20/g, " ");
-    var pageNo = graphic.parentPage.index + 1;
+    var pageNo = graphic.parentPage.name; //!HI
     targetFile.writeln(pageNo + "," + displayParent + "," + name);
   }
 
