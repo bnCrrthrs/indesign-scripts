@@ -8,13 +8,14 @@
   var folder = Folder.selectDialog();
   if (!folder) return;
 
+  var links = [];
   var copied = 0;
   var failed = 0;
 
   for (var i = 0; i < graphics.length; i++) {
     var graphic = graphics[i];
     var link = graphic.itemLink;
-    var target = File(folder.fsName + "/" + link.name);
+
     if (
       !graphic ||
       !link ||
@@ -28,6 +29,7 @@
       !graphic.visible
     )
       continue;
+    var target = File(folder.fsName + "/" + link.name);
     try {
       link.copyLink(target, "bc", true);
       copied++;
