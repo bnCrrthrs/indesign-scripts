@@ -1,24 +1,33 @@
 (function () {
-  if (app.documents.length === 0 || app.activeDocument.pageItems.length === 0) {
-    return;
+  if (app.documents.length === 0) return;
+  var doc = app.activeDocument;
+
+  if (!doc.saved) {
+    try {
+      doc.save();
+    } catch (e) {
+      return;
+    }
   }
 
-  var doc = app.activeDocument;
-  var folder = Folder.selectDialog("Where to save the list to");
-  var fileName = "linked-images.txt";
-  var file = new File(folder + fileName);
+  var fileName = doc.fullName.toString().replace(/\.indd$/i, "-linked-images.txt");
+  var file = File(fileName);
+
+  var date = new Date();
 
   var links = doc.links;
 
   file.encoding = "UTF-8";
   file.open("w");
 
+  file.writeln(date.toLocaleString());
+
   for (var i = 0; i < links.length; i++) {
     var link = links[i];
+    if (i === 0) alert(link.parent);
     var name = link.name;
-    //    var path = link.filePath;
     file.writeln(name);
   }
   file.close();
-  alert("Finished");
+  file.execute();
 })();
