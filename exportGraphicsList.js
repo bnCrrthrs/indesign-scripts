@@ -20,7 +20,7 @@
   var file = File(fileName);
   file.encoding = "UTF-8";
   file.open("w");
-  if (format === "csv") file.writeln("Page,Folder,File");
+  if (format === "csv") file.writeln("Page,Folder,File,Format,Full Path");
 
   for (var i = 0; i < graphics.length; i++) {
     var graphic = graphics[i];
@@ -46,10 +46,12 @@
   function writeCsv(graphic, targetFile) {
     var link = graphic.itemLink;
     var name = link.name;
-    var parent = link.linkResourceURI.match(/[^\/]*(?=\/[^\/]*$)/)[0];
+    var uri = link.linkResourceURI;
+    var parent = uri.match(/[^\/]*(?=\/[^\/]*$)/)[0];
     var displayParent = parent.replace(/%20/g, " ");
-    var pageNo = graphic.parentPage.name; //!HI
-    targetFile.writeln(pageNo + "," + displayParent + "," + name);
+    var pageNo = graphic.parentPage.name;
+    var type = link.linkType;
+    targetFile.writeln(pageNo + "," + displayParent + "," + name + "," + type + "," + uri);
   }
 
   function getFormat() {
