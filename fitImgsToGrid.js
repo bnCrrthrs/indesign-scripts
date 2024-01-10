@@ -1,7 +1,19 @@
 (function () {
   var doc = app.activeDocument;
   var folder;
-  var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg", "tiff", "gif", "jpeg", "bmp", "heic", "pdf"];
+  // var imgFormats = ["jpg", "png", "psd", "ai", "eps", "pdf", "svg", "tiff", "gif", "jpeg", "bmp", "heic"];
+  // var imgFormatsRaster = ["jpg", "png", "tiff", "gif", "jpeg", "bmp", "heic"];
+  // var imgFormatsVector = ["ai", "eps", "svg"];
+  // var imgFormatsPsd = ["psd"];
+  // var imgFormatsPdf = ["pdf"];
+  var imgFormats = [];
+  var imgTypes = {
+    raster: { formats: ["jpg", "png", "tiff", "gif", "jpeg", "bmp", "heic"] },
+    vector: { formats: ["ai", "eps", "svg"] },
+    psd: { formats: ["psd"] },
+    pdf: { formats: ["pdf"] },
+  };
+  // var includeRaster, includeVector, includePsd, includePdf;
   var contents = [];
   var failedFiles = [];
   var recur;
@@ -64,6 +76,33 @@
   colInput.characters = rowInput.characters = 4;
   rowInput.helpTip = "Maximum: " + maxRows;
 
+  //formats
+  panel = window.add("panel", undefined, "Image formats");
+  panel.orientation = "row";
+  panel.alignChildren = "center";
+
+  group = panel.add("group");
+  group.orientation = "column";
+  group.alignChildren = "left";
+  var boxRaster = group.add("checkbox", undefined, "Raster images");
+  var boxVector = group.add("checkbox", undefined, "Vector images");
+
+  group = panel.add("group");
+  group.orientation = "column";
+  group.alignChildren = "left";
+  var boxPsd = group.add("checkbox", undefined, "PSDs");
+  var boxPdf = group.add("checkbox", undefined, "PDFs");
+
+  boxRaster.value = true;
+  boxVector.value = true;
+  boxPsd.value = true;
+  boxPdf.value = true;
+
+  imgTypes.raster.box = boxRaster;
+  imgTypes.vector.box = boxVector;
+  imgTypes.psd.box = boxPsd;
+  imgTypes.pdf.box = boxPdf;
+
   // recursive
   group = window.add("group");
   var btnRecur = group.add("checkbox", undefined, "Include subfolders");
@@ -77,12 +116,10 @@
 
   //+ Dialog functions
   folderBtn.onClick = function () {
-    //    var user = new Folder("~/");
-    //    var f = user.selectDlg("Select folder"); //Dialog("Select files", isImg, true); // for windows, the second argument should be something like "*.jpg"
-    var f = Folder.selectDialog("Select folder"); //Dialog("Select files", isImg, true); // for windows, the second argument should be something like "*.jpg"
+    var f = Folder.selectDialog("Select folder");
     if (!f) return;
     folder = f;
-    folderName.text = f.fullName; //.replace(/%20/g, " ");
+    folderName.text = f.fullName;
     btnOK.enabled = true;
   };
 
@@ -192,6 +229,13 @@
 
   //+ Do the script
   if (window.show() === 0) return;
+
+  //  var imgTypes = Array.from(imgTypes);
+  for (var type in imgTypes) {
+    if (imgTypes.hasOwnProperty(type) && imgTypes[type].box.value) {
+      imgFormats = imgFormats.concat(imgTypes[type].formats);
+    }
+  }
 
   rows = Number(rowInput.text) || rows;
   cols = Number(colInput.text) || cols;
