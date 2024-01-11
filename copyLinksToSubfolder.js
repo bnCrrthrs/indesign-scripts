@@ -8,7 +8,7 @@
   var folder = Folder.selectDialog();
   if (!folder) return;
 
-  var links = [];
+  var processedLinkNames = [];
   var copied = 0;
   var failed = 0;
 
@@ -29,9 +29,20 @@
       !graphic.visible
     )
       continue;
+    var processed = false;
+    for (var j = 0; j < processedLinkNames.length; j++) {
+      if (processedLinkNames[j] === link.name) {
+        processed = true;
+        break;
+      }
+    }
+
+    if (processed) continue;
+
     var target = File(folder.fsName + "/" + link.name);
     try {
       link.copyLink(target, "bc", true);
+      processedLinkNames.push(link.name);
       copied++;
     } catch (_) {
       failed++;
