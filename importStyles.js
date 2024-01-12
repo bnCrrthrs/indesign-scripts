@@ -5,12 +5,12 @@
   if (!doc) return;
   var file;
   var formatStyles = [
-    { name: "Paragraph styles", active: true, format: ImportFormat.PARAGRAPH_STYLES_FORMAT },
-    { name: "Character styles", active: true, format: ImportFormat.CHARACTER_STYLES_FORMAT },
-    { name: "Object styles", active: false, format: ImportFormat.OBJECT_STYLES_FORMAT },
-    { name: "Table/cell styles", active: false, format: ImportFormat.TABLE_AND_CELL_STYLES_FORMAT },
-    { name: "TOC styles", active: false, format: ImportFormat.TOC_STYLES_FORMAT },
-    { name: "Stroke styles", active: false, format: ImportFormat.STROKE_STYLES_FORMAT },
+    { name: "Paragraph styles", defaultActive: true, format: ImportFormat.PARAGRAPH_STYLES_FORMAT },
+    { name: "Character styles", defaultActive: true, format: ImportFormat.CHARACTER_STYLES_FORMAT },
+    { name: "Object styles", defaultActive: false, format: ImportFormat.OBJECT_STYLES_FORMAT },
+    { name: "Table/cell styles", defaultActive: false, format: ImportFormat.TABLE_AND_CELL_STYLES_FORMAT },
+    { name: "TOC styles", defaultActive: false, format: ImportFormat.TOC_STYLES_FORMAT },
+    { name: "Stroke styles", defaultActive: false, format: ImportFormat.STROKE_STYLES_FORMAT },
   ];
   var clashResolution; // GlobalClashResolutionStrategy.LOAD_ALL_WITH_OVERWRITE  // GlobalClashResolutionStrategy.LOAD_ALL_WITH_RENAME
 
@@ -18,8 +18,6 @@
 
   var window = new Window("dialog", "Import styles");
   window.alignChildren = "fill";
-  //  var panel = window.add('panel', undefined, 'Choose a file');
-  //  panel.alignChildren = 'left';
 
   // add File
   var group = window.add("group");
@@ -32,29 +30,31 @@
 
   // choose import options
   var panel = window.add("panel", undefined, "What to import");
+  panel.orientation = "row";
   panel.margins = [10, 25, 10, 20];
   for (var i = 0, l = formatStyles.length; i < l; i++) {
-    if (i % 2 === 0) {
+    if (i % 3 === 0) {
       group = panel.add("group");
-      group.margins = [0, 5, 0, 0];
-    } else {
-      group.add("statictext", undefined, "");
+      group.orientation = "column";
+      group.alignChildren = "left";
+      var leftMargin = i * 10;
+      group.margins = [6 + leftMargin, 10, 6, 0];
+      group.preferredSize = [100, undefined];
     }
     var style = formatStyles[i];
     var btn = group.add("checkbox", undefined, style.name);
     style.btn = btn;
-    if (style.active) {
+    if (style.defaultActive) {
       btn.value = true;
     }
   }
 
   // choose override options
   panel = window.add("panel", undefined, "How to import");
-  panel.margins = [10, 30, 10, 20];
-  group = panel.add("group");
-  group.preferredSize = [200, undefined];
-  var clashOverride = group.add("radiobutton", undefined, "Replace styles");
-  var clashAdd = group.add("radiobutton", undefined, "Rename styles");
+  panel.margins = [80, 30, 10, 20];
+  panel.alignChildren = "left";
+  var clashOverride = panel.add("radiobutton", undefined, "Replace existing styles");
+  var clashAdd = panel.add("radiobutton", undefined, "Rename imported styles");
   clashOverride.value = true;
 
   // ok go
@@ -67,7 +67,7 @@
   ///////////////////////////////////////////////////////////////////////////////
   // functions
   fileBtn.onClick = function () {
-    var f = File.openDialog("Select a file", isIndd, false); // for windows, the second argument should be something like "*.indd"
+    var f = File.openDialog("Select a file", isInddOrFolder, false); // for windows, the second argument should be something like "*.indd"
     if (!f) return;
     file = f;
     fileName.text = f.name.replace(/%20/g, " ");
@@ -82,7 +82,7 @@
     window.close(0);
   };
 
-  function isIndd(file) {
+  function isInddOrFolder(file) {
     var fullName = file.fullName;
     return file instanceof Folder || fullName.slice(fullName.length - 4).toLowerCase() === "indd";
   }
