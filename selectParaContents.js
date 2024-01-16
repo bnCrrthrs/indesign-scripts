@@ -10,10 +10,12 @@
   } else if (selection.constructor.name === "TextFrame") {
     insertCursor();
   } else if (selection.constructor.name === "InsertionPoint") {
+    if (selection.paragraphs.length === 0) return;
     selection.paragraphs[0].select(SelectionOptions.ADD_TO);
     lastCharIsSpace() && removeLastChar();
   } else if (selection.parent.constructor.name === "Story") {
     var points = selection.insertionPoints;
+    if (!points[-1].paragraphs[-1].isValid) return;
     var penultimateCharOfPara = points[-1].paragraphs[-1].characters[-2];
     var lastCharOfPara = points[-1].paragraphs[-1].characters[-1];
     var lastCharOfPoints = points.itemByRange(points.length - 2, points.length - 1);
