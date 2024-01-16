@@ -9,7 +9,9 @@
   if (zeroPoint === BaselineGridRelativeOption.TOP_OF_MARGIN_OF_BASELINE_GRID_RELATIVE_OPTION) {
     baselineStart += marginTop;
   }
+  var marginOffset = baselineStart % baselineDivision;
+
   var objectY = obj.geometricBounds[2];
-  var difference = baselineStart - (objectY % baselineDivision) - baselineStart;
+  var difference = marginOffset - (objectY % baselineDivision);
   obj.move(undefined, [0, difference]);
 })();
