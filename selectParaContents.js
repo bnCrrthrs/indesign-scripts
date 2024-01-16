@@ -11,13 +11,16 @@
     insertCursor();
   } else if (selection.constructor.name === "InsertionPoint") {
     if (selection.paragraphs.length === 0) return;
+    var paraLength = selection.paragraphs[0].characters.length;
     selection.paragraphs[0].select(SelectionOptions.ADD_TO);
-    lastCharIsSpace() && removeLastChar();
+    paraLength > 1 && lastCharIsSpace() && removeLastChar();
   } else if (selection.parent.constructor.name === "Story") {
     var points = selection.insertionPoints;
-    if (!points[-1].paragraphs[-1].isValid) return;
-    var penultimateCharOfPara = points[-1].paragraphs[-1].characters[-2];
-    var lastCharOfPara = points[-1].paragraphs[-1].characters[-1];
+    var thisPara = points[-1].paragraphs[-1];
+    if (!thisPara.isValid) return;
+    var paraLength = thisPara.characters.length;
+    var penultimateCharOfPara = thisPara.characters[-2];
+    var lastCharOfPara = thisPara.characters[-1];
     var lastCharOfPoints = points.itemByRange(points.length - 2, points.length - 1);
 
     var selectionEndsBeforeParaBreak = penultimateCharOfPara === lastCharOfPoints;
@@ -25,7 +28,7 @@
 
     selection.insertionPoints[0].paragraphs[0].select(SelectionOptions.ADD_TO);
     selection.insertionPoints[selection.insertionPoints.length - 1].paragraphs[0].select(SelectionOptions.ADD_TO);
-    selectionEndsBeforeParaBreak || (lastCharOfParaIsParaBreak && removeLastChar());
+    selectionEndsBeforeParaBreak || (paraLength > 1 && lastCharOfParaIsParaBreak && removeLastChar());
   } else {
     try {
       insertCursor();
