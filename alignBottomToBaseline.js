@@ -14,8 +14,12 @@ app.doScript(
       // var obj = app.selection[0];
       var obj = app.selection[i];
       if (!obj.hasOwnProperty("geometricBounds")) continue;
+      if (obj instanceof TextFrame) obj.fit(FitOptions.FRAME_TO_CONTENT);
       var objectY = obj.geometricBounds[2];
       var difference = marginOffset - (objectY % baselineDivision);
+      // alert(difference);
+      // alert(baselineDivision);
+      if (difference / -0.5 > baselineDivision) difference += baselineDivision;
       obj.move(undefined, [0, difference]);
     }
   },
