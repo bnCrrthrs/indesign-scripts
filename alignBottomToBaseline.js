@@ -2,6 +2,7 @@ app.doScript(
   function () {
     if (app.documents.length === 0 || app.selection.length === 0) return;
     var doc = app.activeDocument;
+    var selection = app.selection;
     var baselineStart = doc.gridPreferences.baselineStart;
     var baselineDivision = doc.gridPreferences.baselineDivision;
     var marginTop = doc.marginPreferences.top;
@@ -10,15 +11,14 @@ app.doScript(
       baselineStart += marginTop;
     }
     var marginOffset = baselineStart % baselineDivision;
-    for (var i = 0; i < app.selection.length; i++) {
-      // var obj = app.selection[0];
-      var obj = app.selection[i];
+
+    if (selection[0].parent.constructor.name === "Story") selection = selection[0].parentTextFrames;
+    for (var i = 0; i < selection.length; i++) {
+      var obj = selection[i];
       if (!obj.hasOwnProperty("geometricBounds")) continue;
-      if (obj instanceof TextFrame) obj.fit(FitOptions.FRAME_TO_CONTENT);
+      if (obj instanceof TextFrame && obj.contents !== "") obj.fit(FitOptions.FRAME_TO_CONTENT);
       var objectY = obj.geometricBounds[2];
       var difference = marginOffset - (objectY % baselineDivision);
-      // alert(difference);
-      // alert(baselineDivision);
       if (difference / -0.5 > baselineDivision) difference += baselineDivision;
       obj.move(undefined, [0, difference]);
     }
