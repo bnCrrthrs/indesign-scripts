@@ -49,7 +49,12 @@
     var uri = link.linkResourceURI;
     var parent = uri.match(/[^\/]*(?=\/[^\/]*$)/)[0];
     var displayParent = parent.replace(/%20/g, " ");
-    var pageNo = graphic.parentPage.name;
+    // TODO there's probably a better fix for this?
+    try {
+      var pageNo = graphic.parentPage.name;
+    } catch (_) {
+      var pageNo = "Pasteboard";
+    }
     var type = link.linkType;
     targetFile.writeln(pageNo + "," + displayParent + "," + name + "," + type + "," + uri);
   }
