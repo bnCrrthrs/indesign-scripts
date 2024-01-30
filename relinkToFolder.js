@@ -145,9 +145,12 @@
   // + FUNCTIONS
 
   function getTargetFileName(fName) {
-    var original = fName.split(/\.(?=[^\.]+$)/);
-    var originalName = original[0];
-    var originalExtension = original[1];
+    // var original = fName.split(/\.(?=[^\.]+$)/);
+    // var originalName = original[0];
+    // var originalExtension = original[1];
+    var original = fName.split(".");
+    var originalExtension = original.pop();
+    var originalName = original.join(".");
     var pre = inputPrepend.text;
     var app = inputAppend.text;
     var find = inputFind.text;
