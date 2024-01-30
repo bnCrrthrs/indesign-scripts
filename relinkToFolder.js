@@ -162,6 +162,7 @@
     }
     var findReplaceName = originalName.replace(find, replace);
     var targetName = pre + findReplaceName + app + "." + ext;
+    // if (originalExtension.toLowerCase() === "png") alert(targetName);
     return targetName;
   }
 
@@ -176,7 +177,8 @@
     var targetName = getTargetFileName(linkName);
     for (var j = 0; j < files.length; j++) {
       var file = files[j];
-      var fileName = file.name;
+      // var fileName = file.name; // this worked except for file names with spaces
+      var fileName = file.displayName;
       if (targetName !== fileName) continue;
       link.relink(file);
       return true;
