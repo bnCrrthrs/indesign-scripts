@@ -20,7 +20,11 @@ app.doScript(
       var objectY = obj.geometricBounds[0];
       if (obj instanceof TextFrame && obj.contents !== "") {
         var ascent = Number(obj.lines[0].ascent);
-        var inset = obj.textFramePreferences.insetSpacing[0];
+        var insetSpacing = obj.textFramePreferences.insetSpacing;
+        // var inset = obj.textFramePreferences.insetSpacing[0] || obj.textFramePreferences.insetSpacing || 0;
+        var inset = 0;
+        if (insetSpacing instanceof Array) inset += insetSpacing[0];
+        if (typeof insetSpacing === "number") inset += insetSpacing;
         objectY += ascent + inset;
       }
       var difference = marginOffset - (objectY % baselineDivision);
