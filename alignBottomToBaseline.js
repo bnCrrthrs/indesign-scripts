@@ -6,10 +6,12 @@ app.doScript(
     var baselineStart = doc.gridPreferences.baselineStart;
     var baselineDivision = doc.gridPreferences.baselineDivision;
     var marginTop = doc.marginPreferences.top;
-    var zeroPoint = doc.gridPreferences.baselineGridRelativeOption;
-    if (zeroPoint === BaselineGridRelativeOption.TOP_OF_MARGIN_OF_BASELINE_GRID_RELATIVE_OPTION) {
+    var relZeroPoint = doc.gridPreferences.baselineGridRelativeOption;
+    if (relZeroPoint === BaselineGridRelativeOption.TOP_OF_MARGIN_OF_BASELINE_GRID_RELATIVE_OPTION) {
       baselineStart += marginTop;
     }
+    var docZeroPoint = doc.zeroPoint[1];
+    baselineStart -= docZeroPoint;
     var marginOffset = baselineStart % baselineDivision;
 
     if (selection[0].parent.constructor.name === "Story") selection = selection[0].parentTextFrames;
