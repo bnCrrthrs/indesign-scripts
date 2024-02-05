@@ -20,6 +20,10 @@ app.doScript(
       if (!obj.hasOwnProperty("geometricBounds")) continue;
       if (obj instanceof TextFrame && obj.contents !== "") obj.fit(FitOptions.FRAME_TO_CONTENT);
       var objectY = obj.geometricBounds[2];
+      var insetSpacing = obj.textFramePreferences.insetSpacing;
+      if (insetSpacing instanceof Array) objectY -= insetSpacing[2];
+      if (typeof insetSpacing === "number") objectY -= insetSpacing;
+
       var difference = marginOffset - (objectY % baselineDivision);
       if (difference / -0.5 > baselineDivision) difference += baselineDivision;
       obj.move(undefined, [0, difference]);
