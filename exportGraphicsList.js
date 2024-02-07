@@ -20,7 +20,7 @@
   var file = File(fileName);
   file.encoding = "UTF-8";
   file.open("w");
-  if (format === "csv") file.writeln("Page,Folder,File,Format,Full Path");
+  if (format === "csv") file.writeln("Page,Folder,File,Format,Full Path, Author, Copyright Notice, Creator");
 
   for (var i = 0; i < graphics.length; i++) {
     var graphic = graphics[i];
@@ -45,18 +45,23 @@
 
   function writeCsv(graphic, targetFile) {
     var link = graphic.itemLink;
-    var name = link.name;
+    var name = wrapInQuotes(link.name);
     var uri = link.linkResourceURI;
     var parent = uri.match(/[^\/]*(?=\/[^\/]*$)/)[0];
-    var displayParent = parent.replace(/%20/g, " ");
+    var displayParent = wrapInQuotes(parent.replace(/%20/g, " "));
     // TODO there's probably a better fix for this?
     try {
       var pageNo = graphic.parentPage.name;
     } catch (_) {
       var pageNo = "Pasteboard";
     }
-    var type = link.linkType;
-    targetFile.writeln(pageNo + "," + displayParent + "," + name + "," + type + "," + uri);
+    var type = wrapInQuotes(link.linkType);
+    var author = wrapInQuotes(link.linkXmp.author);
+    var copyrightNotice = wrapInQuotes(link.linkXmp.copyrightNotice);
+    var creator = wrapInQuotes(link.linkXmp.creator);
+    targetFile.writeln(
+      pageNo + "," + displayParent + "," + name + "," + type + "," + uri + "," + author + "," + copyrightNotice + "," + creator
+    );
   }
 
   function getFormat() {
@@ -87,5 +92,9 @@
     };
     if (window.show() === 0) return false;
     return format;
+  }
+
+  function wrapInQuotes(string) {
+    return '"' + string + '"';
   }
 })();
