@@ -21,26 +21,32 @@ app.doScript(
       var availableWidth = pageWidth - (marginLeft + marginRight);
       var colWidth = (availableWidth - (colCount - 1) * colGutter) / colCount;
       var colSpan = colWidth + colGutter;
+      var halfColGutter = colGutter / 2;
 
-      var objectX = obj.geometricBounds[1];
+      var objectX = obj.geometricBounds[1] + docZeroPoint;
 
       if (facingPages && doc.pages[0] !== parentPage) {
         if (parentPage.index === 0) {
+          var intermediate = marginLeft;
           marginLeft = marginRight;
+          marginRight = intermediate;
         } else {
           marginLeft += pageWidth;
         }
       }
-      //* uncomment if you want text with inset spacing to line up with column
+      //* uncomment if you want text with inset spacing to line up with column (might not work any more?)
       // if (obj instanceof TextFrame) {
       //   var insetSpacing = obj.textFramePreferences.insetSpacing;
       //   if (insetSpacing instanceof Array) objectX += insetSpacing[0];
       //   if (typeof insetSpacing === "number") objectX += insetSpacing;
       // }
 
-      var difference = (objectX - marginLeft) % colSpan;
+      var difference = ((objectX - (marginLeft + halfColGutter)) % colSpan) + halfColGutter;
       if (difference > 0.5 * colSpan) difference -= colSpan;
-      difference += docZeroPoint;
+      var newX = objectX - docZeroPoint - difference;
+      var pageRightMargin = parentPage.bounds[3] - marginRight;
+      if (newX > pageRightMargin) difference += colGutter;
+      // difference += docZeroPoint;
       obj.move(undefined, [-difference, 0]);
     }
   },
