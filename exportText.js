@@ -32,6 +32,7 @@
     }
   }
 
+  textFile.write("\n");
   textFile.close();
   if (errorPages.length > 0) alert("Error writing to the following pages: \n" + errorPages.join("\n"));
   textFile.execute();
