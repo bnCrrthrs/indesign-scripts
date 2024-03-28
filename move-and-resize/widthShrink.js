@@ -22,5 +22,4 @@ app.doScript(
   ScriptLanguage.JAVASCRIPT,
   void 0,
   UndoModes.ENTIRE_SCRIPT,
-  "Shrink Width"
-);
+  "Shrink Width");
