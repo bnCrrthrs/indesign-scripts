@@ -1,6 +1,8 @@
 // this will calculate the height of the baselines in your document
 // it will then move each selected object down by that distance
 
+// my keyboard shortcut: fn + ctrl + opt + cmd + down
+
 app.doScript(
   function () {
     if (app.documents.length === 0 || app.activeDocument.pageItems.length === 0 || app.selection.length === 0) {
@@ -19,5 +21,5 @@ app.doScript(
   ScriptLanguage.JAVASCRIPT,
   void 0,
   UndoModes.ENTIRE_SCRIPT,
-  'Move Down'
+  "Move Down"
 );

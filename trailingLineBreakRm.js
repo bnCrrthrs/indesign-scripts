@@ -1,3 +1,5 @@
+// my keyboard shortcut: ctrl + opt + cmd + x
+
 (function () {
   if (app.documents.length === 0 || app.activeDocument.pageItems.length === 0 || app.activeDocument.selection.length === 0) {
     return;

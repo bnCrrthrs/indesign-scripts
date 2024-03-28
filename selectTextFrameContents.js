@@ -1,3 +1,5 @@
+// my keyboard shortcut: opt + esc
+
 (function () {
   if (app.documents.length === 0 || app.selection.length === 0) return;
 

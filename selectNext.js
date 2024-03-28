@@ -1,4 +1,5 @@
 //JUST WACI
+// my keyboard shortcut: ctrl + opt + cmd + down
 
 (function () {
   if (app.documents.length == 0 || app.selection.length == 0) return;

@@ -1,3 +1,4 @@
+// my keyboard shortcut: opt + cmd + n
 app.doScript(
   function () {
     if (app.documents.length === 0 || app.selection.length === 0) return;

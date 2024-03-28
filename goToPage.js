@@ -1,7 +1,9 @@
+// my keyboard shortcut: ctrl + opt + cmd + j
+
 (function () {
   var windows = app.layoutWindows;
   if (windows.length < 1) return;
-  var goTo = prompt('Go to page', '');
+  var goTo = prompt("Go to page", "");
   for (var i = 0; i < windows.length; i++) {
     try {
       var window = windows[i];

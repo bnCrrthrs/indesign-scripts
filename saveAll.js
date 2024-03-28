@@ -1,3 +1,5 @@
+// my keyboard shortcut: ctrl + opt + cmd + s
+
 (function () {
   var docs = app.documents;
   var saved = 0;

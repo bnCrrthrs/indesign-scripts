@@ -1,3 +1,5 @@
+// my keyboard shortcut: shift + fn + ctrl + up
+
 (function () {
   var windows = app.layoutWindows;
   var activeWindow = app.activeWindow;

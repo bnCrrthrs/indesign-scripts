@@ -2,6 +2,8 @@
 // (this is the distance an object will move if you use SHIFT and the arrow keys)
 // it will then increase the width of each selected object by that much
 
+// my keyboard shortcut: fn + ctrl + opt + cmd + right
+
 app.doScript(
   function () {
     if (app.documents.length === 0 || app.activeDocument.pageItems.length === 0 || app.selection.length === 0) {
@@ -21,5 +23,5 @@ app.doScript(
   ScriptLanguage.JAVASCRIPT,
   void 0,
   UndoModes.ENTIRE_SCRIPT,
-  'Expand Width'
+  "Expand Width"
 );
