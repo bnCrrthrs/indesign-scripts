@@ -128,13 +128,13 @@ Decreases the height of the selected object(s) by the height of the baseline inc
 
 _My keyboard shortcut: fn + ctrl + opt + cmd + right_
 
-Increases the width of the selected object(s) by 10 × the keyboard increment (the same amount as an object moves when you press `cmd + →`)
+Increases the width of the selected object(s) by 10 × the keyboard increment (the same amount as an object moves when you press `cmd + →`).
 
 ### widthShrink.js
 
 _My keyboard shortcut: fn + ctrl + opt + cmd + left_
 
-Decreases the width of the selected object(s) by 10 × the keyboard increment (the same amount as an object moves when you press `cmd + →`)
+Decreases the width of the selected object(s) by 10 × the keyboard increment (the same amount as an object moves when you press `cmd + →`).
 
 ## navigate
 
@@ -158,18 +158,6 @@ _My keyboard shortcut: shift + fn + ctrl + up_
 
 Navigates to the previous page of the current document, and navigates all other open documents to the equivalent page where possible.
 
-### viewPasteboard.js
-
-_My keyboard shortcut: ctrl + §_
-
-Sets the zoom so that the whole pasteboard is visible.
-
-### viewSpread.js
-
-_My keyboard shortcut: cmd + §_
-
-Sets the zoom so that the whole spread is visible.
-
 ## select
 
 ### selectParaContents.js
@@ -186,4 +174,4 @@ Executing again will add the paragraph break to the selection, and executing aga
 
 _My keyboard shortcut: opt + esc_
 
-Selects the entire text content of a selected text frame, excluding the last character if it's a space (this allows you to replace the contents without merging with the subsequent paragraph if there is one).
+Selects the entire content of a selected text frame, excluding the last character if it's a space (this allows you to replace the contents without merging with the subsequent paragraph if there is one).

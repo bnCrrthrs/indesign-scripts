@@ -1,3 +1,24 @@
+// removeDuplicateSwatches.js
+// Copyright (C) 2024 Ben Carruthers
+
+// Finds colours in your swatches panel that have the same
+// colour space and colour values, and merges them together.
+
+/*
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
+
 (function () {
   if (app.documents.length === 0 || app.activeDocument.pageItems.length === 0) {
     return;
@@ -44,11 +65,11 @@
   }
 
   if (deleteCount == 0) {
-    alert('No duplicate swatches found');
+    alert("No duplicate swatches found");
   } else if (deleteCount == 1) {
-    alert('One duplicate swatch removed');
+    alert("One duplicate swatch removed");
   } else {
-    alert(deleteCount + ' duplicate swatches removed');
+    alert(deleteCount + " duplicate swatches removed");
   }
 
   function equalValues(aValue, bValue) {
@@ -62,13 +83,13 @@
   function setNameAsValue(swatch) {
     try {
       var value = swatch.colorValue;
-      var space = swatch.space.toString().split('');
+      var space = swatch.space.toString().split("");
       if (value.length !== space.length) return;
-      var name = '';
+      var name = "";
 
       for (var i = 0; i < value.length; i++) {
-        if (i !== 0) name += ' ';
-        name += space[i] + '=' + Math.round(value[i]);
+        if (i !== 0) name += " ";
+        name += space[i] + "=" + Math.round(value[i]);
       }
       swatch.name = name;
     } catch (_) {}
