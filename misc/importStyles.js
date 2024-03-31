@@ -1,6 +1,4 @@
 (function () {
-  //https://www.youtube.com/watch?v=Mkss2eZxsUo&list=PL5Ib-T2waUE5hdJLmHahWL4JwBe84hrJr&index=2 6:04
-
   var doc = app.activeDocument;
   if (!doc) return;
   var file;
