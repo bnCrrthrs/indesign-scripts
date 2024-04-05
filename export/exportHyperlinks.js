@@ -14,20 +14,27 @@
   if (!links.length) return alert("No hyperlinks in document");
 
   var path = "";
+  var name = "";
   if (doc.saved) {
     path = doc.filePath.toString();
+    name = doc.name.replace(/\.[^\.]+$/, "");
   } else {
     path = "~/Desktop";
+    name = "hyperlinks";
   }
-  var newFile = new File(path + "/hyperlinks.csv");
+  var newFile = new File(path + "/" + name + ".csv");
 
   newFile.open("w");
-  newFile.writeln(getCleanString(["Page", "Content", "Destination", "Accessibility text"]));
+  newFile.writeln(getCleanString(["Page", "Content", "Destination"]));
 
   for (var i = 0; i < links.length; i++) {
     var link = links[i];
-    if (link.destination.constructor.name !== "HyperlinkURLDestination") continue;
-    var url = link.destination.destinationURL;
+    try {
+      if (link.destination.constructor.name !== "HyperlinkURLDestination") continue;
+      var url = link.destination.destinationURL;
+    } catch (_) {
+      var url = "ERROR! Couldn't find URL";
+    }
     var source = link.source;
     var sourceType = source.constructor.name.toString();
     if (sourceType === "HyperlinkTextSource") {
@@ -52,6 +59,7 @@
     var cleanList = [];
     var quote = '"';
     var comma = "%2c";
+    var seperator = ",";
     for (var i = 0; i < arr.length; i++) {
       var str = arr[i];
       if (str.match(/^http/)) {
@@ -61,7 +69,7 @@
       }
       cleanList.push(cleanStr);
     }
-    var cleanStr = cleanList.join(",");
+    var cleanStr = cleanList.join(seperator);
     return cleanStr;
   }
 
