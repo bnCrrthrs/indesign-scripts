@@ -88,6 +88,12 @@ app.doScript(
     function moveToFrontOfselectedLayer(item) {
       if (!item.isValid) return;
       ungroup(item); // recursively ungroups if item is part of a group (not if it is a group)
+
+      // selects parent path if item is text on a path
+      if (!item.hasOwnProperty("itemLayer")) {
+        item = item.parent;
+      }
+
       var currentLayer = item.itemLayer;
       var currentLayerLocked = currentLayer.locked;
       if (currentLayerLocked) {
