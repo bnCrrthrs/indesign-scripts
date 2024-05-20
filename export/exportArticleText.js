@@ -180,10 +180,13 @@
         return "\u00b6";
 
       case SpecialCharacters.FOOTNOTE_SYMBOL:
-        return "[footnote ref #]";
+        return getFootnotes(ch); //
 
       case SpecialCharacters.TEXT_VARIABLE:
         return variablesFromCh(ch);
+
+      default:
+        return "\ufffd";
     }
   }
 
@@ -193,6 +196,19 @@
       value += ch.textVariableInstances[vI].resultText;
     }
     return value;
+  }
+
+// "[footnote: " + ch.footnotes[0].contents.toString() + "]";
+
+  function getFootnotes(ch) {
+    var acc = "";
+    for (var i = 0, l = ch.footnotes.length; i < l; i++) {
+      acc += ("[Footnote " + (ch.footnotes[i].index + 1) + ":");
+      acc += ch.footnotes[i].contents.toString().replace(/\s+$/, "");
+      acc += "]";
+    }
+
+    return acc.replace(/[^\S\r\n]+/g, " ");
   }
 })();
 
