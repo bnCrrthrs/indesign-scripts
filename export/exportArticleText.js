@@ -2,10 +2,8 @@
 // Copyright (C) 2024 Ben Carruthers
 // Licensed under the terms of the GNU GPL v3. More details below.
 
-// Saves a text file of all text contained in an Article
-// in the Articles panel. Includes alt - text for images.
-// Currently anchored images have their alt - text placed
-// at the end of the story they are anchored in.
+// Saves a text file of all text contained in an Article in the articles
+// panel. Includes alt-text for images, footnotes and endnotes.
 
 (function () {
   if (app.documents.length === 0) return;
@@ -14,15 +12,23 @@
   var articles = doc.articles;
   if (!articles.length) return;
 
+  var currentItemIsEndnoteFrame = false;
+  var containedEndnotes;
+  var currentEndnote;
+  var endnoteRefCounter = 1;
+  var endnoteContentCounter = 1;
+
   var txtFileName = doc.fullName.toString().replace(/\.\w+$/, "_ARTICLE-TEXT.txt");
   var textFile = new File(txtFileName);
   textFile.encoding = "UTF-8";
 
   textFile.open("w");
   textFile.writeln(doc.name);
+
   for (var i = 0, l = doc.name.length; i < l; i++) {
     textFile.write("=");
   }
+
   textFile.writeln("\n\n");
 
   for (var i = 0; i < articles.length; i++) {
@@ -32,8 +38,15 @@
 
     for (var j = 0; j < members.length; j++) {
       var item = members[j].itemRef;
+      containedEndnotes = 0;
+
       if (item.hasOwnProperty("contentType") && item.contentType == ContentType.TEXT_TYPE) {
-        var chars = item.parentStory.characters;
+        var story = item.parentStory;
+        var chars = story.characters;
+        currentItemIsEndnoteFrame = item instanceof EndnoteTextFrame;
+        containedEndnotes = story.endnotes.length;
+        currentEndnote = 0;
+
         for (var k = 0, l = chars.length; k < l; k++) {
           var character = chars[k];
           var contents = character.contents;
@@ -44,27 +57,12 @@
               var pItem = character.allPageItems[m];
               if (!pItem.hasOwnProperty("objectExportOptions")) continue;
               var altText = pItem.objectExportOptions.customAltText;
-              if (altText) textFile.write(" [GRAPHIC: " + altText + "] ");
+              if (altText) textFile.write("[Graphic: " + altText + "]");
             }
           } else {
             textFile.write(contents);
           }
         }
-
-        /* 
-        var contents = item.parentStory.contents.toString();
-        var containedItems = item.parentStory.allPageItems;
-        // WRITE STORY
-        textFile.writeln(contents);
-
-        //GET ANCHORED OBJET ALT TEXT
-        for (var k = 0; k < containedItems.length; k++) {
-          var containedItem = containedItems[k];
-          if (!containedItem.hasOwnProperty("objectExportOptions")) continue;
-          var containedAltText = containedItem.objectExportOptions.customAltText;
-          if (containedAltText) textFile.writeln(containedAltText);
-        }
-        */
       } else {
         // WRITE ALT TEXT IF NOT STORY
         var altText = item.objectExportOptions.customAltText;
@@ -180,7 +178,7 @@
         return "\u00b6";
 
       case SpecialCharacters.FOOTNOTE_SYMBOL:
-        return getFootnotes(ch); //
+        return getFootnoteOrEndnote(ch); //
 
       case SpecialCharacters.TEXT_VARIABLE:
         return variablesFromCh(ch);
@@ -198,14 +196,19 @@
     return value;
   }
 
-// "[footnote: " + ch.footnotes[0].contents.toString() + "]";
-
-  function getFootnotes(ch) {
+  function getFootnoteOrEndnote(ch) {
     var acc = "";
     for (var i = 0, l = ch.footnotes.length; i < l; i++) {
-      acc += ("[Footnote " + (ch.footnotes[i].index + 1) + ":");
+      acc += "[Footnote " + (ch.footnotes[i].index + 1) + ":";
       acc += ch.footnotes[i].contents.toString().replace(/\s+$/, "");
       acc += "]";
+    }
+
+    if (!acc && containedEndnotes > currentEndnote) {
+      currentEndnote++;
+      acc += "[Endnote " + endnoteRefCounter++ + "]";
+    } else if (!acc && currentItemIsEndnoteFrame) {
+      acc += endnoteContentCounter++;
     }
 
     return acc.replace(/[^\S\r\n]+/g, " ");
