@@ -3,7 +3,7 @@
 // Licensed under the terms of the GNU GPL v3. More details below.
 
 // Saves a text file of all text contained in an Article in the articles
-// panel. Includes alt-text for images, footnotes and endnotes.
+// panel. Includes alt-text for images, footnotes and endnotes, and markdown style headings.
 
 (function () {
   if (app.documents.length === 0) return;
@@ -12,11 +12,16 @@
   var articles = doc.articles;
   if (!articles.length) return;
 
+  var al = articles.length;
+  progress("Exporting...");
+  progress.setArt(al);
+
   var currentItemIsEndnoteFrame = false;
   var containedEndnotes;
   var currentEndnote;
   var endnoteRefCounter = 1;
   var endnoteContentCounter = 1;
+  var buffer = "";
 
   var txtFileName = doc.fullName.toString().replace(/\.\w+$/, "_ARTICLE-TEXT.txt");
   var textFile = new File(txtFileName);
@@ -26,54 +31,114 @@
   textFile.writeln(doc.name);
 
   for (var i = 0, l = doc.name.length; i < l; i++) {
-    textFile.write("=");
+    buffer += "=";
   }
+  buffer += "\n\n";
+  textFile.write(buffer);
 
-  textFile.writeln("\n\n");
-
-  for (var i = 0; i < articles.length; i++) {
-    var article = articles[i];
+  // + LOOP OVER ARTICLES
+  for (var ai = 0; ai < al; ai++) {
+    var article = articles[ai];
     var members = article.articleMembers;
+    var ml = members.length;
+    progress.setMem(ml);
     textFile.writeln("");
 
-    for (var j = 0; j < members.length; j++) {
-      var item = members[j].itemRef;
+    // + LOOP OVER ARTICLE MEMBERS
+    for (var mi = 0; mi < ml; mi++) {
+      var item = members[mi].itemRef;
       containedEndnotes = 0;
 
+      // + FOR TEXT ARTICLE MEMBERS
       if (item.hasOwnProperty("contentType") && item.contentType == ContentType.TEXT_TYPE) {
         var story = item.parentStory;
-        var chars = story.characters;
+        var paras = story.paragraphs;
+        var pl = paras.length;
+        progress.setParas(pl);
+
         currentItemIsEndnoteFrame = item instanceof EndnoteTextFrame;
         containedEndnotes = story.endnotes.length;
         currentEndnote = 0;
 
-        for (var k = 0, l = chars.length; k < l; k++) {
-          var character = chars[k];
-          var contents = character.contents;
-          if (typeof contents !== "string") {
-            textFile.write(charFromEnum(character));
-          } else if (contents.charCodeAt(0) === 65532) {
-            for (var m = 0; m < character.allPageItems.length; m++) {
-              var pItem = character.allPageItems[m];
-              if (!pItem.hasOwnProperty("objectExportOptions")) continue;
-              var altText = pItem.objectExportOptions.customAltText;
-              if (altText) textFile.write("[Graphic: " + altText + "]");
+        // + LOOP OVER PARAGRAPHS
+        for (var pi = 0; pi < pl; pi++) {
+          var para = paras[pi];
+          // var isHeader = false;
+          var prequel = "";
+          var sequel = "";
+          var isList = false;
+          var listLevel = 0;
+
+          // Add hashes to headings
+          var styleExpMap = para.appliedParagraphStyle.styleExportTagMaps;
+          if (styleExpMap.length) {
+            var tag = styleExpMap[0].exportTag;
+            if (tag == "Artefact") {
+              progress.inc();
+              continue;
             }
-          } else {
-            textFile.write(contents);
+            if (tag.match(/^h\d$/i)) {
+              // isHeader = true;
+              prequel = "\n";
+              sequel = " \n";
+              var hLevel = +tag[1];
+              for (var hlI = 0; hlI < hLevel; hlI++) {
+                prequel += "#";
+              }
+              prequel += " ";
+            }
           }
+
+          // check for special chars
+          var allCharsAreStrings = true;
+          buffer = "";
+          for (var ci = 0, cl = para.characters.length; ci < cl; ci++) {
+            if (typeof para.characters[ci] !== "string") {
+              allCharsAreStrings = false;
+              break;
+            }
+          }
+
+          // write para contents
+          if (allCharsAreStrings) {
+            textFile.write(prequel + para.contents + sequel);
+          } else {
+            for (var ci = 0, cl = para.characters.length; ci < cl; ci++) {
+              var character = para.characters[ci];
+              var contents = character.contents;
+              if (typeof contents !== "string") {
+                buffer += charFromEnum(character);
+                // textFile.write(charFromEnum(character));
+              } else if (contents.charCodeAt(0) === 65532) {
+                for (var m = 0; m < character.allPageItems.length; m++) {
+                  var pItem = character.allPageItems[m];
+                  if (!pItem.hasOwnProperty("objectExportOptions")) continue;
+                  var altText = pItem.objectExportOptions.customAltText;
+                  if (altText) buffer += "[Graphic: " + altText + "]";
+                }
+              } else {
+                buffer += contents;
+              }
+            }
+            textFile.write(prequel + buffer + sequel);
+          }
+          progress.inc();
         }
       } else {
-        // WRITE ALT TEXT IF NOT STORY
+        // + FOR NON-TEXT ARTICLE MEMBERS
         var altText = item.objectExportOptions.customAltText;
-        if (altText) textFile.writeln(altText);
+        if (altText) textFile.write("[Graphic: " + altText + "]");
+        progress.inc();
       }
       textFile.write("\n");
     }
   }
 
   textFile.close();
+  progress.close();
   textFile.execute();
+
+  // * HELPER FUNCTIONS
 
   function charFromEnum(ch) {
     switch (ch.contents) {
@@ -212,6 +277,56 @@
     }
 
     return acc.replace(/[^\S\r\n]+/g, " ");
+  }
+
+  function progress(msg) {
+    var window = new Window("palette", "Progress", undefined, { closeButton: false });
+    var text = window.add("statictext", undefined, msg);
+    var bar = window.add("progressbar");
+    var artLength;
+    var memLength;
+    var paraLength;
+    var step;
+    text.preferredSize = [450, -1];
+    bar.preferredSize = [450, -1];
+
+    progress.close = function () {
+      window.close();
+    };
+
+    progress.setArt = function (arts) {
+      bar.value = 0;
+      bar.minvalue = 0;
+      bar.maxvalue = arts;
+      artLength = arts;
+    };
+
+    progress.setMem = function (mems) {
+      memLength = mems;
+      step = Math.min(1 / mems, 1);
+    };
+
+    progress.setParas = function (paras) {
+      paraLength = paras;
+      step = Math.min(artLength / memLength / paras, 1);
+    };
+
+    progress.resetMem = function () {
+      step = Math.min(1 / memLength, 1);
+    };
+
+    progress.inc = function () {
+      bar.value += step;
+      window.update();
+    };
+
+    // progress.msg = function (msg) {
+    //   text.text = "Processing step " + bar.value + " / " + bar.maxvalue + " while step = " + step;
+    //   window.update();
+    // };
+
+    window.show();
+    window.update();
   }
 })();
 
