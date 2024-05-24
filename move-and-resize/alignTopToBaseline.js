@@ -11,11 +11,21 @@
 app.doScript(
   function () {
     if (app.documents.length === 0 || app.selection.length === 0) return;
+
     var doc = app.activeDocument;
     var selection = app.selection;
+    if (selection[0].parent.constructor.name === "Story") selection = selection[0].parentTextFrames;
+    var thisPage = selection[0].parentPage;
+
     var baselineStart = doc.gridPreferences.baselineStart;
     var baselineDivision = doc.gridPreferences.baselineDivision;
-    var marginTop = doc.marginPreferences.top;
+    // var marginTop = doc.marginPreferences.top;
+    var marginTop;
+    if (!thisPage) {
+      marginTop = doc.marginPreferences.top;
+    } else {
+      marginTop = thisPage.marginPreferences.top;
+    }
     var relZeroPoint = doc.gridPreferences.baselineGridRelativeOption;
     if (relZeroPoint === BaselineGridRelativeOption.TOP_OF_MARGIN_OF_BASELINE_GRID_RELATIVE_OPTION) {
       baselineStart += marginTop;
@@ -24,7 +34,6 @@ app.doScript(
     baselineStart -= docZeroPoint;
     var marginOffset = baselineStart % baselineDivision;
 
-    if (selection[0].parent.constructor.name === "Story") selection = selection[0].parentTextFrames;
     for (var i = 0; i < selection.length; i++) {
       var obj = selection[i];
       if (!obj.hasOwnProperty("geometricBounds")) continue;
