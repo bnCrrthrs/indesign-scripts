@@ -23,6 +23,14 @@
   var endnoteContentCounter = 1;
   var buffer = "";
 
+  var footnoteSeparator = new RegExp(
+    "^." +
+      document.footnoteOptions.separatorText
+        .toString()
+        .replace(/([\.\+\*\)])/g, "\\$1")
+        .replace("\t", "\\t")
+  );
+
   var txtFileName = doc.fullName.toString().replace(/\.\w+$/, "_ARTICLE-TEXT.txt");
   var textFile = new File(txtFileName);
   textFile.encoding = "UTF-8";
@@ -64,8 +72,8 @@
         for (var pi = 0; pi < pl; pi++) {
           var para = paras[pi];
           // var isHeader = false;
-          var prequel = "";
-          var sequel = "";
+          var prequel = "\n";
+          var sequel = "\n";
           var isList = false;
           var listLevel = 0;
 
@@ -79,13 +87,16 @@
             }
             if (tag.match(/^h\d$/i)) {
               // isHeader = true;
-              prequel = "\n";
-              sequel = " \n";
+              prequel += "\n";
               var hLevel = +tag[1];
               for (var hlI = 0; hlI < hLevel; hlI++) {
                 prequel += "#";
               }
+              for (var uI = 0, uL = para.contents.toString().replace(/^\s/g, "").replace(/\s$/g, "").length + hLevel + 1; uI < uL; uI++) {
+                sequel += "=";
+              }
               prequel += " ";
+              sequel += "\n";
             }
           }
 
@@ -107,7 +118,14 @@
               var character = para.characters[ci];
               var contents = character.contents;
               if (typeof contents !== "string") {
-                buffer += charFromEnum(character);
+                var result = charFromEnum(character);
+                if (typeof result === "object") {
+                  buffer += result.refs;
+                  sequel += result.notes;
+                } else {
+                  buffer += result;
+                }
+                // buffer += charFromEnum(character);
                 // textFile.write(charFromEnum(character));
               } else if (contents.charCodeAt(0) === 65532) {
                 for (var m = 0; m < character.allPageItems.length; m++) {
@@ -262,21 +280,32 @@
   }
 
   function getFootnoteOrEndnote(ch) {
-    var acc = "";
+    var refAcc = "";
+    var noteAcc = "";
     for (var i = 0, l = ch.footnotes.length; i < l; i++) {
-      acc += "[Footnote " + (ch.footnotes[i].index + 1) + ":";
-      acc += ch.footnotes[i].contents.toString().replace(/\s+$/, "");
-      acc += "]";
+      var noteIndex = ch.footnotes[i].index + 1;
+      refAcc += "[Footnote ref " + noteIndex + "]";
+
+      noteAcc +=
+        "[Footnote " +
+        noteIndex +
+        ": " +
+        ch.footnotes[i].contents
+          .toString()
+          .replace(footnoteSeparator, "")
+          .replace(/[^\S\r\n]+/g, " ")
+          .replace(/\s+$/, "") +
+        "]";
     }
 
-    if (!acc && containedEndnotes > currentEndnote) {
+    if (!refAcc && containedEndnotes > currentEndnote) {
       currentEndnote++;
-      acc += "[Endnote " + endnoteRefCounter++ + "]";
-    } else if (!acc && currentItemIsEndnoteFrame) {
-      acc += endnoteContentCounter++;
+      refAcc += "[Endnote " + endnoteRefCounter++ + "]";
+    } else if (!refAcc && currentItemIsEndnoteFrame) {
+      refAcc += endnoteContentCounter++;
     }
 
-    return acc.replace(/[^\S\r\n]+/g, " ");
+    return { refs: refAcc, notes: noteAcc ? "\n" + noteAcc + "\n" : "" };
   }
 
   function progress(msg) {
@@ -319,11 +348,6 @@
       bar.value += step;
       window.update();
     };
-
-    // progress.msg = function (msg) {
-    //   text.text = "Processing step " + bar.value + " / " + bar.maxvalue + " while step = " + step;
-    //   window.update();
-    // };
 
     window.show();
     window.update();
