@@ -38,7 +38,12 @@ app.doScript(
     for (var i = 0; i < selection.length; i++) {
       var obj = selection[i];
       if (!obj.hasOwnProperty("geometricBounds")) continue;
-      if (obj instanceof TextFrame && obj.contents !== "") obj.fit(FitOptions.FRAME_TO_CONTENT);
+      if (obj instanceof TextFrame && obj.contents !== "") {
+        var leftEdge = obj.geometricBounds[1];
+        var rightEdge = obj.geometricBounds[3];
+        obj.fit(FitOptions.FRAME_TO_CONTENT);
+        obj.geometricBounds = [obj.geometricBounds[0], leftEdge, obj.geometricBounds[2], rightEdge];
+      }
       var objectY = obj.geometricBounds[2];
       if (obj instanceof TextFrame) {
         var insetSpacing = obj.textFramePreferences.insetSpacing;
