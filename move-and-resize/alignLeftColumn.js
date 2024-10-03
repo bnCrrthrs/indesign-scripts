@@ -15,6 +15,7 @@ app.doScript(
 
     var docZeroPoint = doc.zeroPoint[0];
     var facingPages = doc.documentPreferences.facingPages;
+    var bleedLeft = doc.documentPreferences.documentBleedInsideOrLeftOffset;
 
     if (selection[0].parent.constructor.name === "Story") selection = selection[0].parentTextFrames;
 
@@ -43,9 +44,17 @@ app.doScript(
       }
 
       var difference;
-      if (objRelX < marginLeft / 2) {
+      if (objectX < -bleedLeft) continue; // object is to the left of the left-bleed
+
+      if (objectX < -bleedLeft / 2) {
+        // object is closer to bleed than page edge
+        difference = objectX + bleedLeft;
+      } else if (objRelX < marginLeft / 2) {
         // if obj is left of left margin
         difference = objRelX;
+      } else if (objRelX > pageWidth - 0.2 * marginRight) {
+        // if obj is less than 20% of the margin width away from the right edge
+        difference = objRelX - pageWidth;
       } else if (objRelX > pageWidth - marginRight) {
         // if obj is right of right margin
         difference = objRelX - (pageWidth - marginRight);
@@ -64,8 +73,8 @@ app.doScript(
       }
 
       var newX = objectX - docZeroPoint - difference;
-      var pageRightMargin = parentPage.bounds[3] - marginRight;
-      if (newX > pageRightMargin) difference += colGutter;
+      // var pageRightMargin = parentPage.bounds[3] - marginRight; //?
+      // if (newX > pageRightMargin) difference += colGutter; //? think these two lines are no longer needed because i'm offsetting objRelX by page width rather than moving the margins
       obj.move(undefined, [-difference, 0]);
     }
   },
