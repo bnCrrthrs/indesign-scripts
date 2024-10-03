@@ -17,6 +17,7 @@ app.doScript(
     var facingPages = doc.documentPreferences.facingPages;
 
     if (selection[0].parent.constructor.name === "Story") selection = selection[0].parentTextFrames;
+
     for (var i = 0; i < selection.length; i++) {
       var obj = selection[i];
       var parentPage = obj.parentPage;
@@ -33,29 +34,38 @@ app.doScript(
       var halfColGutter = colGutter / 2;
 
       var objectX = obj.geometricBounds[1] + docZeroPoint;
+      var objRelX = objectX % pageWidth;
 
-      if (facingPages && doc.pages[0] !== parentPage) {
-        if (parentPage.index === 0) {
-          var intermediate = marginLeft;
-          marginLeft = marginRight;
-          marginRight = intermediate;
-        } else {
-          marginLeft += pageWidth;
+      if (facingPages && doc.pages[0] !== parentPage && parentPage.index === 0) {
+        var intermediate = marginLeft;
+        marginLeft = marginRight;
+        marginRight = intermediate;
+      }
+
+      var difference;
+      if (objRelX < marginLeft / 2) {
+        // if obj is left of left margin
+        difference = objRelX;
+      } else if (objRelX > pageWidth - marginRight) {
+        // if obj is right of right margin
+        difference = objRelX - (pageWidth - marginRight);
+      } else {
+        // if obj is within margins
+        difference = (objRelX - marginLeft) % colSpan;
+        if (difference > colWidth + 0.7 * colGutter) {
+          difference -= colSpan;
+        } else if (difference > colWidth + 0.3 * colGutter) {
+          difference = difference - colSpan + colGutter / 2;
+        } else if (difference > 0.7 * colWidth) {
+          difference -= colWidth;
+        } else if (difference > 0.3 * colWidth) {
+          difference -= colWidth / 2;
         }
       }
-      //* uncomment if you want text with inset spacing to line up with column (might not work any more?)
-      // if (obj instanceof TextFrame) {
-      //   var insetSpacing = obj.textFramePreferences.insetSpacing;
-      //   if (insetSpacing instanceof Array) objectX += insetSpacing[0];
-      //   if (typeof insetSpacing === "number") objectX += insetSpacing;
-      // }
 
-      var difference = ((objectX - (marginLeft + halfColGutter)) % colSpan) + halfColGutter;
-      if (difference > 0.5 * colSpan) difference -= colSpan;
       var newX = objectX - docZeroPoint - difference;
       var pageRightMargin = parentPage.bounds[3] - marginRight;
       if (newX > pageRightMargin) difference += colGutter;
-      // difference += docZeroPoint;
       obj.move(undefined, [-difference, 0]);
     }
   },
