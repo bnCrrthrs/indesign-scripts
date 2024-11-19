@@ -70,6 +70,10 @@ And as above, when an item that's part of a group is selected, the group is ungr
 
 ## misc
 
+### clearPasteBoard.js
+
+Deletes any page items which aren't actually on a page.
+
 ### importStyles.js
 
 Allows you to select another saved InDesign document and choose sets of styles to import from it: Paragraph / Character / Object / Table and Cell / Table of Contents / Stroke styles. You also have the option to overwrite existing styles with the same name in your current document, or whether to rename imported styles when there is a name conflict.
@@ -124,6 +128,27 @@ _My keyboard shortcut: shift + fn + ctrl + opt + cmd + up_
 
 Decreases the height of the selected object(s) by the height of the baseline increment setting in the current document.
 
+### expandPageItemsToBleed.js
+
+_My keyboard shortcut: ctrl + opt + cmd + E_
+
+Looks for page items near the edge of the current page and expands them to the page bleed. (Also has the effect of cropping things at the bleed lines).
+
+Applies only to selected items if a selection is made, or to all items on the current page if no selection is made.
+
+If one of the items contains text it will ask whether text items should be ignored, because resizing them can adjust the flow of text across frames.
+
+The variable 'tolerance' determines how close to the edge of the page an item needs to be in order to be expanded. When set to 1, anything within 1mm of the edge of the page will get expanded. Adjust the value to affect page items closer or further from the edge.
+
+### fitToColumn.js
+
+Aaligns and resizes selected objects to match the column width. Simply resizes text frames, but rescales other page items. Ignores anything outside of the page margins.
+
+### shufflePositions.js
+
+Swaps positions of two or more selected page items.
+Sensitive to reference point: eg bottom-right reference point will preserve bottom-right coordinates of swapped items
+
 ### widthExpand.js
 
 _My keyboard shortcut: fn + ctrl + opt + cmd + right_
@@ -159,6 +184,12 @@ _My keyboard shortcut: shift + fn + ctrl + up_
 Navigates to the previous page of the current document, and navigates all other open documents to the equivalent page where possible.
 
 ## select
+
+### filterSelectedTextFrames.js
+
+_My keyboard shortcut: ctrl + opt + cmd + t_
+
+Filters the current selection to include only text frames (ie deselects anything that is not a text frame).
 
 ### selectParaContents.js
 
