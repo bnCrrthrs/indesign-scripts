@@ -2,7 +2,9 @@
 // Copyright (C) 2024 Ben Carruthers
 // Licensed under the terms of the GNU GPL v3. More details below.
 
-// Locks all layers, or unlocks them if they are all already locked.
+// If objects are selected, all /other/ layers get locked.
+// If no objects are selected, /all/ layers get locked.
+// If all layers are already locked, they all get unlocked.
 
 // my keyboard shortcut: ctrl + shift + L
 
@@ -14,21 +16,52 @@ app.doScript(
   "Lock / unlock all layers"
 );
 
+function allLayersLocked() {
+  var doc = app.activeDocument;
+  for (var i = 0; i < doc.layers.length; i++) {
+    if (!doc.layers[i].locked) return false;
+  }
+  return true;
+}
+
+function lockAllLayers(bool) {
+  var doc = app.activeDocument;
+  for (var i = 0; i < doc.layers.length; i++) {
+    doc.layers[i].locked = bool;
+  }
+}
+
+function pushToSet(set, item) {
+  for (var i = 0; i < set.length; i++) {
+    if (set[i] === item) return;
+  }
+  set.push(item);
+}
+
 function lockLayers() {
   var doc = app.activeDocument;
   if (!doc) return;
-  var allLayersLocked = true;
+  if (allLayersLocked()) return lockAllLayers(false);
+  if (!doc.selection.length) return lockAllLayers(true);
 
-  for (var i = 0; i < doc.layers.length; i++) {
-    var layer = doc.layers[i];
-    if (layer.locked) continue;
-    allLayersLocked = false;
-    break;
+  var selectedLayers = [];
+  for (var i = 0; i < doc.selection.length; i++) {
+    var item;
+    if (doc.selection[i].parent.constructor.name === "Story") {
+      for (var j = 0; j < doc.selection[i].parentTextFrames.length; j++) {
+        pushToSet(
+          selectedLayers,
+          doc.selection[i].parentTextFrames[j].itemLayer
+        );
+      }
+    } else {
+      pushToSet(selectedLayers, doc.selection[i].itemLayer);
+    }
   }
 
-  for (var i = 0; i < doc.layers.length; i++) {
-    var layer = doc.layers[i];
-    layer.locked = !allLayersLocked;
+  lockAllLayers(true);
+  for (var i = 0; i < selectedLayers.length; i++) {
+    selectedLayers[i].locked = false;
   }
 }
 
