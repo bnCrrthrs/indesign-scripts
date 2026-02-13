@@ -10,57 +10,90 @@
 // my keyboard shortcut: opt + cmd + b
 
 app.doScript(
-  function () {
-    if (app.documents.length === 0 || app.selection.length === 0) return;
-
-    var doc = app.activeDocument;
-    var selection = app.selection;
-    if (selection[0].parent.constructor.name === "Story") selection = selection[0].parentTextFrames;
-    var thisPage = selection[0].parentPage;
-
-    var baselineStart = doc.gridPreferences.baselineStart;
-    var baselineDivision = doc.gridPreferences.baselineDivision;
-    // var marginTop = doc.marginPreferences.top;
-    var marginTop;
-    if (!thisPage) {
-      marginTop = doc.marginPreferences.top;
-    } else {
-      marginTop = thisPage.marginPreferences.top;
-    }
-    var relZeroPoint = doc.gridPreferences.baselineGridRelativeOption;
-    if (relZeroPoint === BaselineGridRelativeOption.TOP_OF_MARGIN_OF_BASELINE_GRID_RELATIVE_OPTION) {
-      baselineStart += marginTop;
-    }
-    var docZeroPoint = doc.zeroPoint[1];
-    baselineStart -= docZeroPoint;
-    var marginOffset = baselineStart % baselineDivision;
-
-    for (var i = 0; i < selection.length; i++) {
-      var obj = selection[i];
-      if (!obj.hasOwnProperty("geometricBounds")) continue;
-      if (obj instanceof TextFrame && obj.contents !== "") {
-        var leftEdge = obj.geometricBounds[1];
-        var rightEdge = obj.geometricBounds[3];
-        obj.fit(FitOptions.FRAME_TO_CONTENT);
-        obj.geometricBounds = [obj.geometricBounds[0], leftEdge, obj.geometricBounds[2], rightEdge];
-      }
-      var objectY = obj.geometricBounds[2];
-      if (obj instanceof TextFrame) {
-        var insetSpacing = obj.textFramePreferences.insetSpacing;
-        if (insetSpacing instanceof Array) objectY -= insetSpacing[2];
-        if (typeof insetSpacing === "number") objectY -= insetSpacing;
-      }
-
-      var difference = marginOffset - (objectY % baselineDivision);
-      if (difference / -0.5 > baselineDivision) difference += baselineDivision;
-      obj.move(undefined, [0, difference]);
-    }
-  },
+  alignBottomToBaseline,
   ScriptLanguage.JAVASCRIPT,
   void 0,
   UndoModes.ENTIRE_SCRIPT,
   "Align to baseline"
 );
+
+// alignBottomToBaseline();
+function alignBottomToBaseline() {
+  if (app.documents.length === 0 || app.selection.length === 0) return;
+
+  var doc = app.activeDocument;
+  var selection = app.selection;
+  if (selection[0].parent.constructor.name === "Story")
+    selection = selection[0].parentTextFrames;
+  var thisPage = selection[0].parentPage;
+
+  var baselineStart = doc.gridPreferences.baselineStart;
+  var baselineDivision = doc.gridPreferences.baselineDivision;
+  // var marginTop = doc.marginPreferences.top;
+  var marginTop;
+  if (!thisPage) {
+    marginTop = doc.marginPreferences.top;
+  } else {
+    marginTop = thisPage.marginPreferences.top;
+  }
+  var relZeroPoint = doc.gridPreferences.baselineGridRelativeOption;
+  if (
+    relZeroPoint ===
+    BaselineGridRelativeOption.TOP_OF_MARGIN_OF_BASELINE_GRID_RELATIVE_OPTION
+  ) {
+    baselineStart += marginTop;
+  }
+  var docZeroPoint = doc.zeroPoint[1];
+  baselineStart -= docZeroPoint;
+  var marginOffset = baselineStart % baselineDivision;
+
+  for (var i = 0; i < selection.length; i++) {
+    var obj = selection[i];
+    if (!obj.hasOwnProperty("geometricBounds")) continue;
+    if (obj instanceof TextFrame && obj.contents !== "") {
+      var topEdge = obj.geometricBounds[0];
+      var leftEdge = obj.geometricBounds[1];
+      var bottomEdge = obj.geometricBounds[2];
+      var rightEdge = obj.geometricBounds[3];
+      // obj.fit(FitOptions.FRAME_TO_CONTENT);
+      // not sure why this isn't working
+      try {
+        obj.fit(FitOptions.FRAME_TO_CONTENT);
+      } catch (_) {
+        obj.fit(FitOptions.CONTENT_AWARE_FIT);
+      }
+      var reducedHeightBy = obj.geometricBounds[2] - bottomEdge;
+      // var hasReducedHeight = obj.geometricBounds[2] !== bottomEdge;
+      var bottomAligned =
+        obj.textFramePreferences.verticalJustification ===
+        VerticalJustification.BOTTOM_ALIGN;
+      var centreAligned =
+        obj.textFramePreferences.verticalJustification ===
+        VerticalJustification.CENTER_ALIGN;
+      if (reducedHeightBy && bottomAligned) {
+        obj.move(undefined, [0, bottomEdge - obj.geometricBounds[2]]);
+      } else if (reducedHeightBy && centreAligned) {
+        obj.move(undefined, [0, (bottomEdge - obj.geometricBounds[2]) / 2]);
+      }
+      obj.geometricBounds = [
+        obj.geometricBounds[0],
+        leftEdge,
+        obj.geometricBounds[2],
+        rightEdge,
+      ];
+    }
+    var objectY = obj.geometricBounds[2];
+    if (obj instanceof TextFrame) {
+      var insetSpacing = obj.textFramePreferences.insetSpacing;
+      if (insetSpacing instanceof Array) objectY -= insetSpacing[2];
+      if (typeof insetSpacing === "number") objectY -= insetSpacing;
+    }
+
+    var difference = marginOffset - (objectY % baselineDivision);
+    if (difference / -0.5 > baselineDivision) difference += baselineDivision;
+    obj.move(undefined, [0, difference]);
+  }
+}
 
 /*
 This program is free software: you can redistribute it and/or modify

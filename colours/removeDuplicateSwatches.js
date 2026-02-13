@@ -61,7 +61,7 @@
   function equalValues(aValue, bValue) {
     if (aValue.length != bValue.length) return false;
     for (var i = 0; i < aValue.length; i++) {
-      if (Math.round(aValue[i]) != Math.round(bValue[i])) return false;
+      if (Math.round(aValue[i]) !== Math.round(bValue[i])) return false;
     }
     return true;
   }
