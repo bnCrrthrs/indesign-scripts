@@ -12,7 +12,7 @@
 // Executing again will add the paragraph break to the selection,
 // and executing again will add the subsequent paragraph.
 
-// my keyboard shortcut: cmd + esc
+// my keyboard shortcut: opt + esc
 
 (function () {
   if (app.documents.length === 0) return;

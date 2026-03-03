@@ -6,7 +6,7 @@
 // the last character if it's a space (this allows you to replace
 // the contents without merging with the subsequent paragraph).
 
-// my keyboard shortcut: opt + esc
+// my keyboard shortcut: cmd + esc
 
 (function () {
   if (app.documents.length === 0 || app.selection.length === 0) return;

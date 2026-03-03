@@ -5,7 +5,7 @@
 // Moves the selected object(s) so that the left edge
 // lines up with the nearest page column.
 
-// my keyboard shortcut: opt + cmd + n
+// my keyboard shortcut: opt + cmd + c
 
 app.doScript(
   function () {
