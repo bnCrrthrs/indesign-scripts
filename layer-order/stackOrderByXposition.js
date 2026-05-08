@@ -9,7 +9,7 @@ app.doScript(
 
     for (var i = sel.length - 1; i >= 0; i--) {
       var item = sel[i];
-      if (item.constructor.name !== "TextFrame") {
+      if (!item.hasOwnProperty("geometricBounds")) {
         item.select(SelectionOptions.REMOVE_FROM);
       } else {
         list.push(item);
@@ -19,43 +19,18 @@ app.doScript(
     if (list.length < 2) return;
 
     var sortedList = mergeSort(list);
+    var layer = list[0].itemLayer;
 
-    app.findGrepPreferences = NothingEnum.nothing;
-    app.changeGrepPreferences = NothingEnum.nothing;
-
-    for (var i = 1; i < list.length; i++) {
-      var frameA = sortedList[i - 1];
-      var frameB = sortedList[i];
-
-      var storyA = frameA.parentStory;
-      var storyB = frameB.parentStory;
-
-      if (storyA === storyB) continue;
-
-      // remove trailing spaces
-      app.findGrepPreferences.findWhat = "((\\n|\\r)\\s?)+\\z";
-      app.changeGrepPreferences.changeTo = "";
-      storyA.changeGrep();
-
-      // add final paragraph break
-      app.findGrepPreferences.findWhat = "\\z";
-      app.changeGrepPreferences.changeTo = "\r";
-      storyA.changeGrep();
-
-      var inFrame = frameB.startTextFrame;
-      var outFrame = frameA.endTextFrame;
-
-      outFrame.nextTextFrame = inFrame;
+    for (var i = 0; i < list.length; i++) {
+      var item = sortedList[i];
+      item.itemLayer = layer;
+      item.bringToFront();
     }
-
-    //Clear the find/change text preferences.
-    app.findGrepPreferences = NothingEnum.nothing;
-    app.changeGrepPreferences = NothingEnum.nothing;
   },
   ScriptLanguage.JAVASCRIPT,
   void 0,
   UndoModes.ENTIRE_SCRIPT,
-  "Connect text frames by X position"
+  "Stack order by X position"
 );
 
 function mergeSort(arr) {

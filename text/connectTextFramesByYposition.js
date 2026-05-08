@@ -85,12 +85,16 @@ function merge(a, b) {
 }
 
 function aHigherThanB(a, b) {
-  if (a.geometricBounds[0] == b.geometricBounds[0]) return aLefterThanB(a,b);
-return a.geometricBounds[0] <= b.geometricBounds[0];
+  if (aboutEqual(a.geometricBounds[0], b.geometricBounds[0])) return aLefterThanB(a, b);
+  return a.geometricBounds[0] <= b.geometricBounds[0];
 }
 
 function aLefterThanB(a, b) {
   return a.geometricBounds[1] < b.geometricBounds[1];
+}
+
+function aboutEqual(a, b) {
+  return Math.abs(a - b) < 0.0005;
 }
 
 /*
