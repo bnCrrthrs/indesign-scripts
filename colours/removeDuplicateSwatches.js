@@ -13,6 +13,8 @@
   var doc = app.activeDocument;
   var swatches = doc.swatches;
   var deleteCount = 0;
+  var tolerance = Number(prompt("Choose tolerance"), 1) || 1;
+
   for (var i = swatches.length - 1; i > 0; i--) {
     var swatchA = swatches[i];
     var matchID = undefined;
@@ -61,7 +63,9 @@
   function equalValues(aValue, bValue) {
     if (aValue.length != bValue.length) return false;
     for (var i = 0; i < aValue.length; i++) {
-      if (Math.round(aValue[i]) !== Math.round(bValue[i])) return false;
+      if (Math.abs(aValue[i] - bValue[i]) > tolerance) return false;
+      // if (tolerance > 1 && Math.abs(aValue[i] - bValue[i]) > tolerance) return false;
+      // if (Math.round(aValue[i]) !== Math.round(bValue[i])) return false; //!!ORIGINAL
     }
     return true;
   }
